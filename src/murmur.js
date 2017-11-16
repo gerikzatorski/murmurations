@@ -126,7 +126,7 @@ class Murmuration {
 	    var containing_neighbor = [];
 	    var boundaries = [];
 	    var status = [];
-	    
+
 	    /* Test relationships with other boids */
 	    for (var j = 0; j < this.numBoids; j++) {
 		// don't test relationship with self
@@ -191,7 +191,7 @@ class Murmuration {
 		neighbors_extended.sort(ComparatorNeighbors);
 		for (var x = 0; x < 4 && x < neighbors_extended.length; x++) { vect_neighbors.addSelf(last_states[neighbors_extended[x][0]]); }
 		vect_neighbors.divideScalar(Math.min(4, neighbors_extended.length));
-		
+
 		/* Calculate projection vector */
 		var x_vectors = [];
 		var y_vectors = [];
