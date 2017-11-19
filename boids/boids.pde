@@ -1,67 +1,43 @@
-import java.util.Collections;
-import java.util.Comparator;
-
+// Objects
 Flock flock;
-int n_boids = 20;
-int t = 0;
+Predator predator;
 
+// Simulation Parameters
+int n_boids = 4;
+boolean debugging = true;
+boolean physics = false;
 float predator_radius = 20;
 
+// debugging stuff
+int step = 0;
+
 // control parameters (sum to 1)
-float phi_p = 0.20;
-float phi_a = 0.50;
-float phi_n = 0.30;
+float phi_p = 0.30;
+float phi_a = 0.60;
+float phi_n = 0.10;
 
 void setup() {
   size(640, 360);
   flock = new Flock();
+  predator = new Predator();
   // Add an initial set of boids into the system
   for (int i = 0; i < n_boids; i++) {
-    flock.addBoid(new Boid(width/2,height/2,i));
+    // flock.addBoid(new Boid(width/2,height/2,i));
+    flock.addBoid(new Boid(random(width), random(height), i));
   }
-
-  // debugging sort stuff
-  // ArrayList<Event> tEvents = new ArrayList<Event>()
-  // tEvents.add(new Event(0, new Boid(0,0,0), true));
-  // tEvents.add(new Event(1, new Boid(1,1,1), true));
-  // tEvents.add(new Event(2, new Boid(2,2,2), true));
-  // tEvents.add(new Event(5, new Boid(5,5,5), true));
-  // tEvents.add(new Event(3, new Boid(3,3,3), false));
-  // tEvents.add(new Event(4, new Boid(4,4,4), true));
-
-  // println(tEvents);
-  // sort_events(tEvents);
-  // println(tEvents);
-
-  // debugging sort stuff
-  // ArrayList<Boid> tBoids = new ArrayList<Boid>();
-  // Boid b = new Boid(0,0,0);
-  // tBoids.add(new Boid(5,5,5));
-  // tBoids.add(new Boid(1,1,1));
-  // tBoids.add(new Boid(2,2,2));
-  // tBoids.add(new Boid(3,3,3));
-  // tBoids.add(new Boid(4,4,4));
-
-  // println(tBoids);
-  // sort_neighbors(tBoids, b);
-  // println(tBoids);
-
 }
 
 void draw() {
-  // if (!mousePressed) return;
-  // only execute stuff below on mouse click
-  println("-------------# t = " + t);
+  if (debugging) println("-------------# steps = " + step);
+  // if (!mousePressed) return; // only execute stuff below on mouse click
   background(50);
+  predator.run();
   flock.run();
-  t++;
+  step++;
 }
 
 // The Event Class
-
-// class Event implements Comparable<Event> {
 class Event {
-
   float theta;
   Boid boid;
   boolean start;
@@ -78,35 +54,37 @@ class Event {
   String toString() {
     return theta + " " + start;
   }
-
 }
 
 // The Flock (a list of Boid objects)
-
 class Flock {
-
   ArrayList<Boid> boids; // An ArrayList for all the boids
-
   Flock() {
     boids = new ArrayList<Boid>(); // Initialize the ArrayList
   }
-
   void run() {
     for (Boid b : boids) {
-      // println("Running boid # " + b.id);
       b.run(boids);  // Passing the entire list of boids to each boid individually
     }
   }
-
   void addBoid(Boid b) {
     boids.add(b);
   }
 }
 
+// The Predator class
+class Predator {
+  PVector position = new PVector();
+  Predator() {
+  }
+  void run() {
+    position.x = mouseX;
+    position.y = mouseY;
+  }
+}
+
 // The Boid class
-
 class Boid {
-
   PVector position;
   PVector velocity;
   PVector acceleration;
@@ -115,28 +93,24 @@ class Boid {
   float maxspeed;    // Maximum speed
   int id;
 
-  // PriorityQueue<Boid> close_neighbors = new PriorityQueue<Boid>(4); // closest 4 neighbors
   ArrayList<Boid> close_neighbors = new ArrayList<Boid>(); // closest 4 neighbors
-  // Boid pierced_boid = null;
   
   Boid(float x, float y, int num) {
     acceleration = new PVector(0, 0);
     id = num;
-
-    // This is a new PVector method not yet implemented in JS
-    // velocity = PVector.random2D();
-
-    // Leaving the code temporarily this way so that this example runs in JS
+    // velocity = PVector.random2D(); // not implementing in processing.js
     float angle = random(TWO_PI);
     velocity = new PVector(cos(angle), sin(angle));
     position = new PVector((float)x, (float)y);
     r = 2.0;
     maxspeed = 2;
-    maxforce = 0.03;
+    // maxforce = 0.03;
+    maxforce = 0.09;
   }
 
   String toString() {
-    String s = "Boid #" + id + ": " + position.x + " " + position.y;
+    // String s = "Boid #" + id + ": " + "(" + position.x + "," + position.y + ")" + ;
+    String s = "Boid #" + id + ": " + "(" + position + ")";
     return s;
   }
 
@@ -152,41 +126,48 @@ class Boid {
     acceleration.add(force);
   }
 
-  
+
+  void radial_scan() {
+    // create event queue
+    
+  }
+
   // We accumulate a new acceleration each time based on three rules
   void flock(ArrayList<Boid> boids) {
-
     ArrayList<Event> eventq = new ArrayList<Event>();
     ArrayList<Boid> status = new ArrayList<Boid>();
     ArrayList<Float> boundaries = new ArrayList<Float>();
     ArrayList<Boid> in_sight = new ArrayList<Boid>();       // line-of-sight neighbors
     boolean overlapping = false;
+
+    radial_scan(); // todo
     
     // Create event queue based on other relationship with other boids
     for (Boid other : boids) {
       if (this == other) { continue; } // don't add self to queue
+
       float d = PVector.dist(position, other.position);
-      if (d < r) {
+      float dx = other.position.x - position.x;
+      float dy = other.position.y - position.y;
+
+      float dtheta = asin( other.r/d );
+      float rel_theta = atan2( dy , dx );
+
+      if (d < r || Float.isNaN(dtheta) || Float.isNaN(rel_theta)) {
         overlapping = true;
         break;
       }
       
-      float dtheta = asin( (float) other.r/d );
-      float rel_theta = atan2( other.position.y-position.y , other.position.x-position.x );
       eventq.add(new Event(rel_theta-dtheta, other, true));
       eventq.add(new Event(rel_theta+dtheta, other, false));
     }
 
-    // ensure thetas are in range [0,2*PI)
-    for (Event e : eventq) {
-      if (e.theta < 0) {
-        e.theta += 2*PI;
-      }
-    }
-
     // sort event queue by thetas
-    // Collections.sort(eventq);
-    eventq = sort_events(eventq);
+    if (!overlapping) {
+    // if (eventq.size() > 0) {
+      // Sorting.sort_events(eventq);
+      Sorting.sort_events_merge(eventq, 0, eventq.size()-1);
+    }
 
     // cycle through eventq in order to determine boundaries and line-of-sight neighbors
     for (Event e : eventq) {
@@ -196,7 +177,8 @@ class Boid {
           status.remove(e.boid);
         }
       } else {
-        if (status.size() == 0) {
+        if (status.isEmpty()) {
+        // if (status.size() == 0) {
           boundaries.add(e.theta);
           status.add(e.boid);
         }
@@ -217,7 +199,7 @@ class Boid {
         }
       }
     }
-    
+
     // todo: reset range of boundaries?
     ArrayList<PVector> vect_boundaries = new ArrayList<PVector>();
     ArrayList<PVector> vect_neighbors = new ArrayList<PVector>();
@@ -227,10 +209,8 @@ class Boid {
     }
 
     // only use 4 closest line-of-sight neighbors
-    // k closest neighbor
     // Collections.sort(in_sight, createComparator(this));
-    in_sight = sort_neighbors(in_sight, this);
-    
+    in_sight = Sorting.sort_neighbors(in_sight, this);
     close_neighbors.clear();
     for (int i = 0; i < min(4,in_sight.size()); i++) {
       close_neighbors.add(in_sight.get(i));
@@ -244,28 +224,54 @@ class Boid {
     PVector alig = average_direction(vect_neighbors);;
     PVector nois = PVector.random2D();
 
+    PVector predator_vectory = new PVector(mouseX, mouseY);
+    float d_pred = PVector.dist(position, predator_vectory);
 
-    PVector predator = new PVector(mouseX, mouseY);
-    float d_pred = PVector.dist(position, predator);
-
+    // determine desired direction
+    PVector steer = new PVector(0,0);
     if (d_pred < predator_radius) {
-      PVector vect_escape = new PVector(position.x-predator.x, position.y-predator.y);
-      vect_escape.mult(0.9);
-      applyForce(vect_escape);
+      PVector vect_escape = new PVector(position.x-predator_vectory.x, position.y-predator_vectory.y);
+      steer.add(vect_escape);
+      // applyForce(vect_escape);
+      // return;
     } else if (!overlapping) {
       // Arbitrarily weight these forces
       proj.mult(phi_p);
       alig.mult(phi_a);
       nois.mult(phi_n);
-      // Add the force vectors to acceleration
-      applyForce(proj);
-      applyForce(alig);
-      applyForce(nois);
+
+      steer.add(proj);
+      steer.add(alig);
+      steer.add(nois);
     } else {
-      applyForce(nois); // all noise if vision is blocked (ie overlapped = true)
+      steer.add(nois); // all noise if vision is blocked (ie overlapped = true)
     }
+
+    if (!physics)  {
+      applyForce(steer);
+      return;
+    }
+    
+    // Implement Reynolds: Steering = Desired - Velocity
+    steer.normalize();
+    steer.mult(maxspeed);
+    steer.sub(velocity);
+    steer.limit(maxforce);
+    applyForce(steer);
   }
 
+  PVector flee(PVector target) {
+    PVector desired = PVector.sub(position, target); // A vector pointing from the target to the position
+    // Scale to maximum speed
+    desired.normalize();
+    desired.mult(maxspeed); // desired.setMag(maxspeed); // not implemented in Processing.js
+
+    // Steering = Desired minus Velocity
+    PVector steer = PVector.sub(desired, velocity);
+    steer.limit(maxforce);
+    return steer;
+  }
+  
   // Method to update position
   void update() {
     velocity.add(acceleration); // Update velocity
@@ -276,11 +282,8 @@ class Boid {
 
   void render() {
     // Draw a triangle rotated in the direction of velocity
-    float theta = velocity.heading2D() + radians(90);
-    // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
+    float theta = velocity.heading2D() + radians(90); // works with processing.js (now heading() in processing)
 
-    // text(str(id), position.x, position.y);
-    
     fill(200, 100);
     stroke(255);
     pushMatrix();
@@ -301,69 +304,94 @@ class Boid {
     if (position.x > width+r) position.x = -r;
     if (position.y > height+r) position.y = -r;
   }
-
 }
 
 PVector average_direction(ArrayList<PVector> vectors) {
-  int n = vectors.size();
-  float x = 0;
-  float y = 0;
+  PVector result = new PVector(0,0);
   for (PVector v : vectors) {
-    x += v.x;
-    y += v.y;
+    result.x += v.x;
+    result.y += v.y;
   }
-  return new PVector(x/n , y/n);
+  // return result.div(vectors.size());
+  return result.normalize();
 }
 
-// cannot use this with processing.js
-// Comparator<Boid> createComparator(Boid b) {
-//   final Boid finalB = new Boid(b.position.x, b.position.y, b.id);
-//   return new Comparator<Boid>() {
+// Java Collections not available in Processing.js
+static class Sorting {
 
-//     public int compare(Boid b0, Boid b1) {
-//       float ds0 = PVector.dist(finalB.position, b0.position);
-//       float ds1 = PVector.dist(finalB.position, b1.position);
-//       return Float.compare(ds0, ds1);
-//     }
-//   };
-// }
-
-ArrayList<Event> sort_events(ArrayList<Event> events) {
-  int min;
-  for (int i = 0; i < events.size(); ++i) {
-    min = i;
-    for (int j = events.size()-1; j > i; --j) {
-      if (events.get(j).theta < events.get(min).theta) {
-        min = j;
+  /* Brute force sorting for Events ArrayList */
+  static void sort_events(ArrayList<Event> events) {
+    int min;
+    for (int i = 0; i < events.size(); ++i) {
+      min = i;
+      for (int j = events.size()-1; j > i; --j) {
+        if (events.get(j).theta < events.get(min).theta) {
+          min = j;
+        }
       }
+      Event tmp = events.get(i);
+      events.set(i, events.get(min));
+      events.set(min, tmp);
     }
-    Event tmp = events.get(i);
-    events.set(i, events.get(min));
-    events.set(min, tmp);
   }
-  return events;
-}
 
-ArrayList<Boid> sort_neighbors(ArrayList<Boid> neighbors, Boid b) {
-  int min;
-  for (int i = 0; i < neighbors.size(); ++i) {
-    min = i;
-    for (int j = neighbors.size()-1; j > i; --j) {
+  /* Brute force sorting for Boids ArrayList */
+  static ArrayList<Boid> sort_neighbors(ArrayList<Boid> neighbors, Boid b) {
+    int min;
+    for (int i = 0; i < neighbors.size(); ++i) {
+      min = i;
+      for (int j = neighbors.size()-1; j > i; --j) {
       
-      Boid b0 = neighbors.get(min);
-      Boid b1 = neighbors.get(j);
-      float ds0 = PVector.dist(b.position, b0.position);      
-      float ds1 = PVector.dist(b.position, b1.position);
+        Boid b0 = neighbors.get(min);
+        Boid b1 = neighbors.get(j);
+        float ds0 = PVector.dist(b.position, b0.position);      
+        float ds1 = PVector.dist(b.position, b1.position);
       
-      if (ds1 < ds0) {
-        min = j;
+        if (ds1 < ds0) {
+          min = j;
+        }
       }
+      Boid tmp = neighbors.get(i);
+      neighbors.set(i, neighbors.get(min));
+      neighbors.set(min, tmp);
     }
-    Boid tmp = neighbors.get(i);
-    neighbors.set(i, neighbors.get(min));
-    neighbors.set(min, tmp);
+    return neighbors;
   }
-  return neighbors;
 
+  // #################################################
+  // Merge Sort
+  // #################################################
+
+  static void sort_events_merge(ArrayList<Event> events, int l, int r) {
+    if (l < r) {
+      int m = (l+r)/2;
+      sort_events_merge(events, l, m);
+      sort_events_merge(events, m+1, r);
+      merge(events, l, m, r);
+    }
+  }
+
+  static void merge(ArrayList<Event> events, int l, int m, int r) {
+    ArrayList<Event> temp = new ArrayList<Event>();
+    temp = events;
+    int i = l;
+    int j = m + 1;
+    int k = l;
+    while (i <= m && j <= r) {
+      if (temp.get(i).theta <= temp.get(j).theta) {
+        events.set(k, temp.get(i));
+        i++;
+      } else {
+        events.set(k, temp.get(j));
+        j++;
+      }
+      k++;
+    }
+    while (i <= m) {
+      events.set(k, temp.get(i));
+      k++;
+      i++;
+    }
+  }
 }
 
