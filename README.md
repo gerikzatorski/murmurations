@@ -4,8 +4,8 @@ Murmurations are the name of a flock of startings which exhibit particularly mes
 
 ## Algorithms
 
-1989 - Craig Reynolds - http://www.red3d.com/cwr/boids/
-2014 - Daniel J.G. Pearce - http://www.pnas.org/content/111/29/10422.abstract
+* 1989 - Craig Reynolds - http://www.red3d.com/cwr/boids/
+* 2014 - Daniel J.G. Pearce - http://www.pnas.org/content/111/29/10422.abstract
 
 ## Javascript Dependencies
 
