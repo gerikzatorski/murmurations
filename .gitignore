@@ -1,0 +1,5 @@
+# Visual Studio options directory
+.vs/
+
+# cmake build directories
+out/
