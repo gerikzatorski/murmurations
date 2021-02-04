@@ -13,7 +13,6 @@ add_library(murmurations STATIC
     src/Helpers.cpp
     src/Flock.cpp
     src/Boid.cpp
-    src/FlockingStrategy.cpp
 )
 
 target_include_directories(murmurations

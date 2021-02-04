@@ -1,13 +1,11 @@
 #ifndef __BOID_HPP__
 #define __BOID_HPP__
 
-#include <Eigen/Dense>
 #include <iostream>
-#include <cmath>
 #include <queue>
+#include <thread>
 #include <set>
-#include <vector>
-
+#include <Eigen/Dense>
 #include "Helpers.hpp"
 
 namespace murmurations {
@@ -19,9 +17,9 @@ namespace murmurations {
 			, _position(position)
 			, _velocity(velocity)
 			, _acceleration(Eigen::Vector2d(0, 0))
-			, _maxSpeed(3)
-			, _mass(2)
-			, _radius(4) 
+			, _maxSpeed(1.0)
+			, _mass(1.0)
+			, _radius(3.0)
 		{}
 
 		int id() const;
@@ -31,7 +29,9 @@ namespace murmurations {
 		Eigen::Vector2d velocity() const;
 		Eigen::Vector2d acceleration() const;
 
+		void flock(std::vector<Boid>);
 		void update();
+
 		void applyForce(Eigen::Vector2d);
 		double euclideanDistance(Boid) const;
 		void print();
@@ -45,7 +45,6 @@ namespace murmurations {
 		double _mass;
 		double _radius;
 	};
-
 }
 
 #endif

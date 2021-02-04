@@ -4,19 +4,18 @@
 
 #include "Boid.hpp"
 #include "Flock.hpp"
-#include "FlockingStrategy.hpp"
 
 using namespace std;
 using namespace murmurations;
 
 int main() {
-    srand((unsigned int)time(0));
+    //srand((unsigned int)time(0));
 	cout << "Starting murmur program" << endl;
 
 	// Setup
-	Flock flock(40);
-	int maxSteps = 200;
-    sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
+	Flock flock(4);
+	int maxSteps = 140;
+    sf::RenderWindow window(sf::VideoMode(1000, 800), "My window");
 
     // Loop
     int step = 0;
@@ -43,7 +42,7 @@ int main() {
         // draw stuff ...
         // TODO: threads
         for (auto& b : flock.boids) {
-            sf::CircleShape shape(4.f);
+            sf::CircleShape shape(3.f);
             shape.setFillColor(sf::Color(100, 250, 50));
             shape.setPosition((float)b.position().x(), (float)b.position().y());
             window.draw(shape);
