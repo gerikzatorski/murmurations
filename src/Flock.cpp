@@ -2,10 +2,9 @@
 
 murmurations::Flock::Flock(int n)
 {
-
 	// Add boids
 	for (int i = 0; i < n; i++) {
-		Eigen::Vector2d position = 2 * Eigen::Vector2d::Random(2);
+		Eigen::Vector2d position = Eigen::Vector2d::Random(2);
 		position = 100*(position + Eigen::Vector2d::Constant(4)); // 300-500
 		Eigen::Vector2d velocity = Eigen::Vector2d::Random(2);
 

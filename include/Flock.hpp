@@ -18,12 +18,6 @@ namespace murmurations {
 		void print();
 		void flock();
 		std::vector<Boid> boids;
-		// void render(what visualizer?);
-
-		//void setStrategy(FlockEnum);
-
-	//private:
-	//	std::unique_ptr<FlockingStrategy> _strategy;
 	};
 }
 

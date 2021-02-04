@@ -27,10 +27,6 @@ Eigen::Vector2d murmurations::Boid::acceleration() const
 
 void murmurations::Boid::flock(std::vector<Boid> boids)
 {
-	//Eigen::Vector2d projection = Eigen::Vector2d::Constant(0.0);
-	//Eigen::Vector2d alignment = Eigen::Vector2d::Constant(0.0);
-	//radialScan(projection, alignment);
-
 	//std::cout << "Flocking for " << id() << " on thread " << std::this_thread::get_id() << std::endl;
 	
 	bool overlapping = false;
@@ -38,6 +34,7 @@ void murmurations::Boid::flock(std::vector<Boid> boids)
 	std::priority_queue<murmurations::Event, std::vector<murmurations::Event>> pq; // sorts based on event theta (light/dark domains)
 	std::priority_queue<murmurations::Neighbor, std::vector<murmurations::Neighbor>> inSight; // sorts based on neighbor distance
 
+	// generate light/dark domain priority queue
 	for (auto& other : boids)
 	{
 		// skip self when comparing
@@ -45,17 +42,15 @@ void murmurations::Boid::flock(std::vector<Boid> boids)
 		if (id() == other.id())
 			continue;
 
-		double d = euclideanDistance(other);
-		double dx = other.position().x() - position().x();
-		double dy = other.position().y() - position().y();
-
-		double reltheta = atan2(dy, dx);
-		double dtheta = asin(other.radius() / d);
+		Eigen::Vector2d diff = other.position() - _position;
+		double dist = sqrt(diff.dot(diff));
+		double reltheta = atan2(diff.y(), diff.x());
+		double dtheta = asin(other.radius() / dist);
 
 		//printf("[%i] %f,%f,%f reltheta = %f, dtheta = %f\n", b.getID(), d, dx, dy, reltheta, dtheta);
 
 		// no pushing events related to boids that overlap center
-		if (d < other.radius()) {
+		if (dist < other.radius()) {
 			overlapping = true;
 			continue;
 		}
@@ -67,6 +62,7 @@ void murmurations::Boid::flock(std::vector<Boid> boids)
 	std::set<int> status; // ids of boids blocking vision at any given point
 	std::set<double> boundaries;
 
+	// unpack light/dark domain priority queue
 	while (!pq.empty())
 	{
 		murmurations::Event e = pq.top();
@@ -89,13 +85,14 @@ void murmurations::Boid::flock(std::vector<Boid> boids)
 			}
 		}
 
-		// TODO: neighbors in line of sight
+		// neighbors in line of sight
 		int piercedBoid = 0;
 		double minDist = 1000.0 * 1000.0;
 		if (!status.empty())
 		{
-			// TODO: should not use int ID here
-			for (auto& id : status) {
+			// TODO: comparing IDs is cheap
+			for (auto& id : status)
+			{
 				double dist = euclideanDistance(boids[id]);
 				if (dist < minDist)
 				{
@@ -109,19 +106,24 @@ void murmurations::Boid::flock(std::vector<Boid> boids)
 		pq.pop();
 	}
 
-	std::vector<Eigen::Vector2d> vectorBoundaries;
-	std::vector<Eigen::Vector2d> vectorNeighbors;
+	Eigen::Vector2d boundaryAvg = Eigen::Vector2d::Constant(0);
+	Eigen::Vector2d neighborSum = Eigen::Vector2d::Constant(0);
 
+	// TODO: be smarter here
+	int i = 0;
 	for (auto& theta : boundaries)
-		vectorBoundaries.push_back(Eigen::Vector2d(cos(theta), sin(theta)));
+	{
+		boundaryAvg += Eigen::Vector2d(cos(theta), sin(theta));
+		i++;
+	}
+	boundaryAvg /= i;
 
 	// get only the nearest 4 neighbors
 	for (int i = 0; i <= 4 && !inSight.empty(); i++)
 	{
 		murmurations::Neighbor currNeighbor = inSight.top();
-		int nid = currNeighbor.id();
-		murmurations::Boid b = boids[nid];
-		vectorNeighbors.push_back(b.velocity());
+		murmurations::Boid b = boids[currNeighbor.id()];
+		neighborSum += b.velocity();
 	}
 
 	// TODO: this is a flock level variable for the projection strategy
@@ -130,9 +132,9 @@ void murmurations::Boid::flock(std::vector<Boid> boids)
 	double phi_a = 0.55;
 	double phi_n = 0.35;
 
-	Eigen::Vector2d desiredVelocity = phi_p * murmurations::AverageDirection(vectorBoundaries) +
-		phi_a * murmurations::AverageDirection(vectorNeighbors) +
-		phi_n * Eigen::Vector2d::Random();
+	Eigen::Vector2d desiredVelocity = phi_p * boundaryAvg +
+		                              phi_a * neighborSum.normalized() +
+		                              phi_n * Eigen::Vector2d::Random();
 
 	// Reynolds: steering force = desired velocity - current velocity
 	desiredVelocity.normalize();
@@ -152,9 +154,10 @@ void murmurations::Boid::applyForce(Eigen::Vector2d force)
 {
 	_acceleration += (force/_mass);
 }
-double murmurations::Boid::euclideanDistance(Boid other) const
+double murmurations::Boid::euclideanDistance(Boid& other) const
 {
-	return sqrt(pow((this->position().x() - other.position().x()), 2) + pow((this->position().y() - other.position().y()), 2));
+	Eigen::Vector2d diff = other.position() - _position;
+	return sqrt(diff.dot(diff));
 }
 void murmurations::Boid::print()
 {

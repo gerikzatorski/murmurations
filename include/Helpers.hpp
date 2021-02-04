@@ -3,7 +3,6 @@
 
 #include <Eigen/Dense>
 #include <vector>
-#include <cmath>
 
 namespace murmurations {
 
@@ -52,8 +51,6 @@ namespace murmurations {
 			return lhs < rhs;
 		}
 	};
-
-	Eigen::Vector2d AverageDirection(std::vector<Eigen::Vector2d>);
 }
 
 #endif

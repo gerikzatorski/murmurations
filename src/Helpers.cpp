@@ -21,6 +21,7 @@ bool murmurations::operator > (const murmurations::Neighbor& lhs, const murmurat
 }
 
 /* -------------------- EVENT --------------------*/
+
 int murmurations::Event::getID()
 {
 	return _id;
@@ -44,12 +45,4 @@ bool murmurations::operator < (const murmurations::Event& lhs, const murmuration
 bool murmurations::operator > (const murmurations::Event& lhs, const murmurations::Event& rhs)
 {
 	return lhs.getTheta() > rhs.getTheta();
-}
-
-Eigen::Vector2d murmurations::AverageDirection(std::vector<Eigen::Vector2d> vectors)
-{
-	Eigen::Vector2d res = Eigen::Vector2d(0, 0);
-	for (auto& v : vectors)
-		res = res + v;
-	return res;
 }

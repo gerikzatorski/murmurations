@@ -3,9 +3,10 @@
 
 #include <iostream>
 #include <queue>
-#include <thread>
+#include <thread> // TODO: only for priting thread_id atm
 #include <set>
 #include <Eigen/Dense>
+#include <cmath>
 #include "Helpers.hpp"
 
 namespace murmurations {
@@ -17,8 +18,8 @@ namespace murmurations {
 			, _position(position)
 			, _velocity(velocity)
 			, _acceleration(Eigen::Vector2d(0, 0))
-			, _maxSpeed(1.0)
-			, _mass(1.0)
+			, _maxSpeed(3.0)
+			, _mass(1.5)
 			, _radius(3.0)
 		{}
 
@@ -33,7 +34,7 @@ namespace murmurations {
 		void update();
 
 		void applyForce(Eigen::Vector2d);
-		double euclideanDistance(Boid) const;
+		double euclideanDistance(Boid&) const;
 		void print();
 
 	private:

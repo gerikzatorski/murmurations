@@ -13,8 +13,8 @@ int main() {
 	cout << "Starting murmur program" << endl;
 
 	// Setup
-	Flock flock(4);
-	int maxSteps = 140;
+	Flock flock(30);
+	int maxSteps = 200;
     sf::RenderWindow window(sf::VideoMode(1000, 800), "My window");
 
     // Loop
