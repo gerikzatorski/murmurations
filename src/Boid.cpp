@@ -124,13 +124,14 @@ void murmurations::Boid::flock(std::vector<Boid> boids)
 		murmurations::Neighbor currNeighbor = inSight.top();
 		murmurations::Boid b = boids[currNeighbor.id()];
 		neighborSum += b.velocity();
+		inSight.pop();
 	}
 
 	// TODO: this is a flock level variable for the projection strategy
 	// represent that in code
 	double phi_p = 0.10;
-	double phi_a = 0.55;
-	double phi_n = 0.35;
+	double phi_a = 0.25;
+	double phi_n = 0.65;
 
 	Eigen::Vector2d desiredVelocity = phi_p * boundaryAvg +
 		                              phi_a * neighborSum.normalized() +
@@ -144,8 +145,13 @@ void murmurations::Boid::flock(std::vector<Boid> boids)
 void murmurations::Boid::update()
 {
 	_velocity += _acceleration;
-	_velocity.normalize();
-	_velocity *= _maxSpeed;
+
+	if (sqrt(_velocity.dot(_velocity)) > _maxSpeed)
+	{
+		_velocity.normalize();
+		_velocity *= _maxSpeed;
+	}
+	
 	_position += _velocity;
 	_acceleration = Eigen::Vector2d::Constant(0); // reset acceleration
 }
@@ -161,5 +167,5 @@ double murmurations::Boid::euclideanDistance(Boid& other) const
 }
 void murmurations::Boid::print()
 {
-	printf("%4i: %6.1f %6.1f | %6.2f %6.2f | %6.2f %6.2f\n", _id, _position.x(), _position.y(), _velocity.x(), _velocity.y(), _acceleration.x(), _acceleration.y());
+	printf("%4i: %6.1f %6.1f | %6.2f %6.2f | %6.2f %6.2f | %6.2f\n", _id, _position.x(), _position.y(), _velocity.x(), _velocity.y(), _acceleration.x(), _acceleration.y(), sqrt(_velocity.dot(_velocity)));
 }

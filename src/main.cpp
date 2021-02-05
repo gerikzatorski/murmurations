@@ -9,12 +9,12 @@ using namespace std;
 using namespace murmurations;
 
 int main() {
-    //srand((unsigned int)time(0));
+    srand((unsigned int)time(0));
 	cout << "Starting murmur program" << endl;
 
 	// Setup
-	Flock flock(30);
-	int maxSteps = 200;
+	Flock flock(50);
+	int maxSteps = 700;
     sf::RenderWindow window(sf::VideoMode(1000, 800), "My window");
 
     // Loop
@@ -22,7 +22,7 @@ int main() {
     while (window.isOpen()) {
         printf("------ STEP %i ------\n", step);
 
-        flock.print();
+        //flock.print();
         auto start = chrono::high_resolution_clock::now();
         flock.flock();
         auto stop = chrono::high_resolution_clock::now();

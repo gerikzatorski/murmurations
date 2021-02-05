@@ -18,8 +18,8 @@ namespace murmurations {
 			, _position(position)
 			, _velocity(velocity)
 			, _acceleration(Eigen::Vector2d(0, 0))
-			, _maxSpeed(3.0)
-			, _mass(1.5)
+			, _maxSpeed(2.0)
+			, _mass(2.0)
 			, _radius(3.0)
 		{}
 
