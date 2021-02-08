@@ -12,16 +12,20 @@
 namespace murmurations {
 
 	class Boid {
+
 	public:
-		Boid(int id, Eigen::Vector2d position, Eigen::Vector2d velocity)
+		Boid(int id, std::function<void(Boid&, std::vector<Boid>&)> strategy, Eigen::Vector2d position, Eigen::Vector2d velocity)
 			: _id(id)
+			, _strategy(strategy)
 			, _position(position)
 			, _velocity(velocity)
 			, _acceleration(Eigen::Vector2d(0, 0))
 			, _maxSpeed(2.0)
-			, _mass(2.0)
+			, _mass(50.0)
 			, _radius(3.0)
 		{}
+
+		~Boid() = default;
 
 		int id() const;
 		double radius() const;
@@ -30,9 +34,12 @@ namespace murmurations {
 		Eigen::Vector2d velocity() const;
 		Eigen::Vector2d acceleration() const;
 
-		void flock(std::vector<Boid>);
+		void setStrategy(std::function<void(Boid&, std::vector<Boid>&)>);
+		void flock(std::vector<Boid>&);
+		friend void basic(Boid&, std::vector<Boid>&);
+		friend void projection(Boid&, std::vector<Boid>&);
+		
 		void update();
-
 		void applyForce(Eigen::Vector2d);
 		double euclideanDistance(Boid&) const;
 		void print();
@@ -45,6 +52,7 @@ namespace murmurations {
 		double _maxSpeed;
 		double _mass;
 		double _radius;
+		std::function<void(Boid&, std::vector<Boid>&)> _strategy;
 	};
 }
 

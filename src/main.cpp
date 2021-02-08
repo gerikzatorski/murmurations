@@ -5,6 +5,9 @@
 #include "Boid.hpp"
 #include "Flock.hpp"
 
+#define WINDOW_WIDTH 1000
+#define WINDOW_HEIGHT 800
+
 using namespace std;
 using namespace murmurations;
 
@@ -15,7 +18,7 @@ int main() {
 	// Setup
 	Flock flock(50);
 	int maxSteps = 700;
-    sf::RenderWindow window(sf::VideoMode(1000, 800), "My window");
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "My window");
 
     // Loop
     int step = 0;
@@ -40,11 +43,14 @@ int main() {
         window.clear(sf::Color::Black);
 
         // draw stuff ...
-        // TODO: threads
         for (auto& b : flock.boids) {
             sf::CircleShape shape(3.f);
             shape.setFillColor(sf::Color(100, 250, 50));
-            shape.setPosition((float)b.position().x(), (float)b.position().y());
+            //float x = (float)(b.position().x() - flock.center().x()) + WINDOW_WIDTH / 2;
+            //float y = (float)(b.position().y() - flock.center().y()) + WINDOW_HEIGHT / 2;
+            float x = (float)b.position().x();
+            float y = (float)b.position().y();
+            shape.setPosition(x, y);
             window.draw(shape);
         }
 

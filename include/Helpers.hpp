@@ -23,6 +23,7 @@ namespace murmurations {
 		int _id;
 		double _distance;
 	};
+
 	class Event
 	{
 	public:

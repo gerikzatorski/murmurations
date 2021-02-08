@@ -10,6 +10,7 @@ int murmurations::Neighbor::id()
 {
 	return _id;
 }
+
 bool murmurations::operator < (const murmurations::Neighbor& lhs, const murmurations::Neighbor& rhs)
 {
 	return lhs.distance() < rhs.distance();

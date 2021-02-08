@@ -1,7 +1,6 @@
 #ifndef __FLOCK_HPP__
 #define __FLOCK_HPP__
 
-#include <random>
 #include <vector>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -15,9 +14,12 @@ namespace murmurations {
 	class Flock {
 	public:
 		Flock(int);
+		
+		std::vector<Boid> boids;
+
 		void print();
 		void flock();
-		std::vector<Boid> boids;
+		Eigen::Vector2d center();
 	};
 }
 

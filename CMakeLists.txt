@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(murmurations)
 
-
 find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 include_directories(${SFML_INCLUDE_DIR})
 link_libraries(sfml-graphics)
@@ -25,3 +24,9 @@ target_link_libraries(main murmurations sfml-graphics)
 
 # Tests
 # enable_testing()
+# find_package(GTest MODULE REQUIRED)
+# include_directories(${GTEST_INCLUDE_DIRS})
+
+# add_executable(runtests test/main.cpp)
+# target_link_libraries(runtests PUBLIC murmurations PRIVATE GTest::GTest GTest::Main)
+# add_test(NAME alltests COMMAND runtests)
