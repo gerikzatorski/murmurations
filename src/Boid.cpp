@@ -1,18 +1,11 @@
 #include "Boid.hpp"
 
-int murmurations::Boid::id() const { return _id; }
-
-double murmurations::Boid::radius() const { return _radius; }
-
-double murmurations::Boid::maxSpeed() const { return _maxSpeed; }
-
-Eigen::Vector2d murmurations::Boid::position() const { return _position; }
-
-Eigen::Vector2d murmurations::Boid::velocity() const { return _velocity; }
-
-Eigen::Vector2d murmurations::Boid::acceleration() const {
-  return _acceleration;
-}
+murmurations::Boid::Boid(int id, std::function<void(Boid &, std::vector<Boid> &)> strategy,
+                         Eigen::Vector2d position, Eigen::Vector2d velocity)
+      : id(id), _strategy(strategy), position(position), velocity(velocity),
+        acceleration(Eigen::Vector2d(0, 0)), maxSpeed(2.0), mass(50.0),
+        radius(3.0)
+{}
 
 void murmurations::Boid::setStrategy(
     std::function<void(Boid &, std::vector<Boid> &)> strategy) {
@@ -30,7 +23,7 @@ void murmurations::basic(murmurations::Boid &refBoid,
   std::vector<murmurations::Boid> localFlockmates{};
   double localRadius = 100.0;
   for (auto &b : boids) {
-    if (refBoid.id() != b.id() && refBoid.euclideanDistance(b) < localRadius)
+    if (refBoid.id != b.id && refBoid.euclideanDistance(b) < localRadius)
       localFlockmates.push_back(b);
   }
 
@@ -39,24 +32,24 @@ void murmurations::basic(murmurations::Boid &refBoid,
   Eigen::Vector2d cohesion = Eigen::Vector2d::Constant(0);
 
   for (auto &b : localFlockmates) {
-    Eigen::Vector2d dv = refBoid.position() - b.position();
+    Eigen::Vector2d dv = refBoid.position - b.position;
     dv.normalize();
     separation += dv;
-    alignment += b.velocity();
-    cohesion += b.position();
+    alignment += b.velocity;
+    cohesion += b.position;
   }
 
   if (!localFlockmates.empty()) {
     cohesion /= localFlockmates.size();
     // cohesion is currently the center of the local flockmates
-    cohesion -= refBoid.position();
+    cohesion -= refBoid.position;
   }
 
   separation.normalize();
   alignment.normalize();
   cohesion.normalize();
 
-  // printf(" -%i- %6.2f, %6.2f | %6.2f, %6.2f | %6.2f, %6.2f\n", refBoid.id(),
+  // printf(" -%i- %6.2f, %6.2f | %6.2f, %6.2f | %6.2f, %6.2f\n", refBoid.id,
   // separation.x(), separation.y(), alignment.x(), alignment.y(), cohesion.x(),
   // cohesion.y());
 
@@ -70,14 +63,14 @@ void murmurations::basic(murmurations::Boid &refBoid,
                                     cohesion_factor * cohesion;
 
   // Reynolds: steering force = desired velocity - current velocity
-  refBoid.applyForce(desiredVelocity.normalized() * refBoid.maxSpeed() -
-                     refBoid.velocity());
+  refBoid.applyForce(desiredVelocity.normalized() * refBoid.maxSpeed -
+                     refBoid.velocity);
 }
 
 void murmurations::projection(murmurations::Boid &refBoid,
                               std::vector<murmurations::Boid> &boids) {
-  // std::cout << "Flocking for " << id() << " on thread " <<
-  // std::this_thread::get_id() << std::endl;
+  // std::cout << "Flocking for " << id << " on thread " <<
+  // std::this_thread::getid() << std::endl;
 
   bool overlapping = false;
 
@@ -91,25 +84,25 @@ void murmurations::projection(murmurations::Boid &refBoid,
   for (auto &other : boids) {
     // skip self when comparing
     // TODO: comparing IDs is cheap
-    if (refBoid.id() == other.id())
+    if (refBoid.id == other.id)
       continue;
 
-    Eigen::Vector2d diff = other.position() - refBoid._position;
+    Eigen::Vector2d diff = other.position - refBoid.position;
     double dist = sqrt(diff.dot(diff));
     double reltheta = atan2(diff.y(), diff.x());
-    double dtheta = asin(other.radius() / dist);
+    double dtheta = asin(other.radius / dist);
 
     // printf("[%i] %f,%f,%f reltheta = %f, dtheta = %f\n", b.getID(), d, dx,
     // dy, reltheta, dtheta);
 
     // no pushing events related to boids that overlap center
-    if (dist < other.radius()) {
+    if (dist < other.radius) {
       overlapping = true;
       continue;
     }
 
-    pq.push(murmurations::Event(reltheta + dtheta, other.id(), true));
-    pq.push(murmurations::Event(reltheta - dtheta, other.id(), false));
+    pq.push(murmurations::Event(reltheta + dtheta, other.id, true));
+    pq.push(murmurations::Event(reltheta - dtheta, other.id, false));
   }
 
   std::set<int> status; // ids of boids blocking vision at any given point
@@ -119,15 +112,15 @@ void murmurations::projection(murmurations::Boid &refBoid,
   while (!pq.empty()) {
     murmurations::Event e = pq.top();
 
-    if (!e.isFront()) {
+    if (!e.frontEdge) {
       // handle case where other boid straddles beginning theta
       if (!status.empty()) {
-        boundaries.insert(e.getTheta());
+        boundaries.insert(e.theta);
         status.erase(e.getID());
       }
     } else {
       if (status.empty()) {
-        boundaries.insert(e.getTheta());
+        boundaries.insert(e.theta);
         status.insert(e.getID());
       }
     }
@@ -164,8 +157,8 @@ void murmurations::projection(murmurations::Boid &refBoid,
   // get only the nearest 4 neighbors
   for (int i = 0; i <= 4 && !inSight.empty(); i++) {
     murmurations::Neighbor currNeighbor = inSight.top();
-    murmurations::Boid b = boids[currNeighbor.id()];
-    neighborSum += b.velocity();
+    murmurations::Boid b = boids[currNeighbor.id];
+    neighborSum += b.velocity;
     inSight.pop();
   }
 
@@ -179,33 +172,33 @@ void murmurations::projection(murmurations::Boid &refBoid,
                                     phi_n * Eigen::Vector2d::Random();
 
   // Reynolds: steering force = desired velocity - current velocity
-  refBoid.applyForce(desiredVelocity.normalized() * refBoid.maxSpeed() -
-                     refBoid.velocity());
+  refBoid.applyForce(desiredVelocity.normalized() * refBoid.maxSpeed -
+                     refBoid.velocity);
 }
 
 void murmurations::Boid::update() {
-  _velocity += _acceleration;
+  velocity += acceleration;
 
-  if (sqrt(_velocity.dot(_velocity)) > _maxSpeed) {
-    _velocity.normalize();
-    _velocity *= _maxSpeed;
+  if (sqrt(velocity.dot(velocity)) > maxSpeed) {
+    velocity.normalize();
+    velocity *= maxSpeed;
   }
 
-  _position += _velocity;
-  _acceleration = Eigen::Vector2d::Constant(0); // reset acceleration
+  position += velocity;
+  acceleration = Eigen::Vector2d::Constant(0); // reset acceleration
 }
 
 void murmurations::Boid::applyForce(Eigen::Vector2d force) {
-  _acceleration += (force / _mass);
+  acceleration += (force / mass);
 }
 
 double murmurations::Boid::euclideanDistance(Boid &other) const {
-  Eigen::Vector2d diff = other.position() - _position;
+  Eigen::Vector2d diff = other.position - position;
   return sqrt(diff.dot(diff));
 }
 
 void murmurations::Boid::print() {
-  printf("%4i: %6.1f %6.1f | %6.2f %6.2f | %6.2f %6.2f\n", _id, _position.x(),
-         _position.y(), _velocity.x(), _velocity.y(), _acceleration.x(),
-         _acceleration.y());
+  printf("%4i: %6.1f %6.1f | %6.2f %6.2f | %6.2f %6.2f\n", id, position.x(),
+         position.y(), velocity.x(), velocity.y(), acceleration.x(),
+         acceleration.y());
 }

@@ -8,26 +8,17 @@
 #include <queue>
 #include <set>
 #include <thread> // TODO: only for printing thread_id atm
+#include <memory>
 
 namespace murmurations {
 
+// class Flock; // declare for Boid's pointer
+  
 class Boid {
 
 public:
-  Boid(int id, std::function<void(Boid &, std::vector<Boid> &)> strategy,
-       Eigen::Vector2d position, Eigen::Vector2d velocity)
-      : _id(id), _strategy(strategy), _position(position), _velocity(velocity),
-        _acceleration(Eigen::Vector2d(0, 0)), _maxSpeed(2.0), _mass(50.0),
-        _radius(3.0) {}
-
-  ~Boid() = default;
-
-  int id() const;
-  double radius() const;
-  double maxSpeed() const;
-  Eigen::Vector2d position() const;
-  Eigen::Vector2d velocity() const;
-  Eigen::Vector2d acceleration() const;
+  Boid(int, std::function<void(Boid &, std::vector<Boid> &)>,
+       Eigen::Vector2d, Eigen::Vector2d);
 
   void setStrategy(std::function<void(Boid &, std::vector<Boid> &)>);
   void flock(std::vector<Boid> &);
@@ -39,15 +30,17 @@ public:
   double euclideanDistance(Boid &) const;
   void print();
 
+  int id;
+  Eigen::Vector2d position;
+  Eigen::Vector2d velocity;
+  Eigen::Vector2d acceleration;
+  double maxSpeed;
+  double mass;
+  double radius;
+
 private:
-  int _id;
-  Eigen::Vector2d _position;
-  Eigen::Vector2d _velocity;
-  Eigen::Vector2d _acceleration;
-  double _maxSpeed;
-  double _mass;
-  double _radius;
   std::function<void(Boid &, std::vector<Boid> &)> _strategy;
+  // std::unique_ptr<Flock> _flock;
 };
 } // namespace murmurations
 

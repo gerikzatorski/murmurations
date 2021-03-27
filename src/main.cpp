@@ -49,11 +49,11 @@ int main() {
     for (auto &b : flock.boids) {
       sf::CircleShape shape(3.f);
       shape.setFillColor(sf::Color(100, 250, 50));
-      // float x = (float)(b.position().x() - flock.center().x()) + WINDOW_WIDTH
-      // / 2; float y = (float)(b.position().y() - flock.center().y()) +
+      // float x = (float)(b.position.x() - flock.center().x()) + WINDOW_WIDTH
+      // / 2; float y = (float)(b.position.y() - flock.center().y()) +
       // WINDOW_HEIGHT / 2;
-      float x = (float)b.position().x();
-      float y = (float)b.position().y();
+      float x = (float)b.position.x();
+      float y = (float)b.position.y();
       shape.setPosition(x, y);
       window.draw(shape);
     }

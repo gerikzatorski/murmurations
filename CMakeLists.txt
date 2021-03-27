@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.5)
 project(murmurations)
 
-find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
+list(APPEND CMAKE_MODULE_PATH "/usr/share/SFML/cmake/Modules")
+find_package(SFML COMPONENTS graphics REQUIRED)
 include_directories(${SFML_INCLUDE_DIR})
 link_libraries(sfml-graphics)
 
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+include_directories(${EIGEN3_INCLUDE_DIR})
 
 # Generate the static library from the library sources
 add_library(murmurations
