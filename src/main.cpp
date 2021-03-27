@@ -5,6 +5,7 @@
 #include "Boid.hpp"
 #include "Flock.hpp"
 
+#define NUM_BOIDS 50
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 800
 
@@ -16,7 +17,15 @@ int main() {
   cout << "Starting murmur program" << endl;
 
   // Setup
-  Flock flock(50);
+  Flock flock{};
+  for (int i = 0; i < NUM_BOIDS; i++) {
+    Eigen::Vector2d position = Eigen::Vector2d::Random(2);
+    position = 100 * (position + Eigen::Vector2d::Constant(4));
+    Eigen::Vector2d velocity = Eigen::Vector2d::Random(2);
+
+    Boid b = Boid(i, position, velocity);
+    flock.boids.push_back(b);
+  }
   int maxSteps = 700;
   sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT),
                           "My window");

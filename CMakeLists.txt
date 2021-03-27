@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.5)
 project(murmurations)
 
+# wont work with 2.5
+# https://en.sfml-dev.org/forums/index.php?topic=24070.0
 list(APPEND CMAKE_MODULE_PATH "/usr/share/SFML/cmake/Modules")
-find_package(SFML COMPONENTS graphics REQUIRED)
-include_directories(${SFML_INCLUDE_DIR})
-link_libraries(sfml-graphics)
+find_package(SFML 2 REQUIRED network audio graphics window system)
+if(SFML_FOUND)
+  include_directories(${SFML_INCLUDE_DIR})
+  link_libraries(${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+endif()
 
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -23,7 +27,7 @@ target_include_directories(murmurations
 )
 
 add_executable(main src/main.cpp)
-target_link_libraries(main murmurations sfml-graphics)
+target_link_libraries(main murmurations)
 
 # Tests
 # enable_testing()
