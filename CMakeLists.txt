@@ -8,15 +8,16 @@ link_libraries(sfml-graphics)
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
 # Generate the static library from the library sources
-add_library(murmurations STATIC 
-    src/Helpers.cpp
-    src/Flock.cpp
-    src/Boid.cpp
+add_library(murmurations
+  STATIC
+  src/Helpers.cpp
+  src/Flock.cpp
+  src/Boid.cpp
 )
 
 target_include_directories(murmurations
-    PUBLIC 
-        ${PROJECT_SOURCE_DIR}/include
+  PUBLIC
+  ${PROJECT_SOURCE_DIR}/include
 )
 
 add_executable(main src/main.cpp)
