@@ -13,9 +13,9 @@
 namespace murmurations {
 class Flock {
 public:
-  Flock(int);
+  std::vector<Boid> boids{};
 
-  std::vector<Boid> boids;
+  Flock();
 
   void print();
   void flock();
