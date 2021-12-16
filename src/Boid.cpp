@@ -1,5 +1,8 @@
 #include "Boid.hpp"
 
+#include <queue>
+#include <set>
+
 murmurations::Boid::Boid(int id, Eigen::Vector2d position, Eigen::Vector2d velocity)
       : id(id), position(position), velocity(velocity),
         acceleration(Eigen::Vector2d(0, 0)), maxSpeed(2.0), mass(50.0),
@@ -189,7 +192,7 @@ double murmurations::Boid::euclideanDistance(Boid &other) const {
   return sqrt(diff.dot(diff));
 }
 
-void murmurations::Boid::print() {
+void murmurations::Boid::print() const {
   printf("%4i: %6.1f %6.1f | %6.2f %6.2f | %6.2f %6.2f\n", id, position.x(),
          position.y(), velocity.x(), velocity.y(), acceleration.x(),
          acceleration.y());

@@ -10,5 +10,23 @@ Murmurations are the name of a flock of startings which exhibit particularly mes
 ## Dependencies
 
 * [Eigen3](https://eigen.tuxfamily.org/)
-* [SFML](https://www.sfml-dev.org/)
-* [googletest](https://github.com/google/googletest)
+* [GLFW](https://www.glfw.org/)
+* [GLAD](https://github.com/Dav1dde/glad)
+
+It should be simple to setup on Linux:
+
+```sh
+sudo apt install libeigen3-dev
+
+sudo apt install libglfw3
+sudo apt install libglfw3-dev
+
+git clone https://github.com/Dav1dde/glad.git
+cd glad
+cmake ./
+make
+sudo cp -a include /usr/local/
+sudo cp -a src /usr/local/
+cd ..
+rm -rf glad
+```

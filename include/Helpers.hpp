@@ -1,9 +1,6 @@
 #ifndef __HELPERS_HPP__
 #define __HELPERS_HPP__
 
-#include <Eigen/Dense>
-#include <vector>
-
 namespace murmurations {
 
 class Neighbor {

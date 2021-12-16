@@ -2,13 +2,8 @@
 #define __BOID_HPP__
 
 #include "Helpers.hpp"
+#include <vector>
 #include <Eigen/Dense>
-#include <cmath>
-#include <iostream>
-#include <queue>
-#include <set>
-#include <thread> // TODO: only for printing thread_id atm
-#include <memory>
 
 namespace murmurations {
 
@@ -32,8 +27,9 @@ public:
   void update();
   void applyForce(Eigen::Vector2d);
   double euclideanDistance(Boid &) const;
-  void print();
+  void print() const ;
 };
+
 } // namespace murmurations
 
 #endif

@@ -1,4 +1,5 @@
 #include "Helpers.hpp"
+
 /* -------------------- NEIGHBOR --------------------*/
 
 murmurations::Neighbor::Neighbor(int id, double distance) : id(id), distance(distance)

@@ -1,22 +1,21 @@
 #include "Flock.hpp"
 
-murmurations::Flock::Flock() {}
+murmurations::Flock::Flock(unsigned int count) {
+  for (unsigned int i = 0; i < count; i++) {
+    Eigen::Vector2d position = 100 * Eigen::Vector2d::Random(2);
+    Eigen::Vector2d velocity = Eigen::Vector2d::Random(2);
 
-void murmurations::Flock::print() {
+    Boid b = Boid(i, position, velocity);
+    boids.push_back(b);
+  }
+}
+
+void murmurations::Flock::print() const {
   for (auto &b : boids)
     b.print();
 }
 
 void murmurations::Flock::flock() {
-  
-  // Threaded approach
-  // std::vector<std::thread> threads;
-  // for (auto& b : boids)
-  //	threads.push_back(std::thread ([&] { b.flock(boids); }));
-  // for (auto& th : threads)
-  //	th.join();
-
-  // Non-threaded approach
   for (auto &b : boids)
     b.flock(boids);
 
@@ -24,7 +23,7 @@ void murmurations::Flock::flock() {
     b.update();
 }
 
-Eigen::Vector2d murmurations::Flock::center() {
+Eigen::Vector2d murmurations::Flock::center() const {
   Eigen::Vector2d res = Eigen::Vector2d::Constant(0);
   for (auto &b : boids)
     res += b.position;
