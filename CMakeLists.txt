@@ -31,6 +31,7 @@ set(SOURCE_FILES
   src/Helpers.cpp
   src/Flock.cpp
   src/Boid.cpp
+  src/Shader.cpp
 )
 
 add_library(murmurations STATIC ${SOURCE_FILES})
